@@ -2,6 +2,17 @@
 
 Format: **Symptom → Cause → Fix → Lesson**
 
+## App
+
+### Logs show `HTTP Request: ... huggingface.co ... 403 Forbidden` at startup
+- **Cause:** Gradio sends usage telemetry by default; corporate network blocks it.
+- **Fix:** `GRADIO_ANALYTICS_ENABLED=False` set in `app/__init__.py` before gradio is imported.
+- **Lesson:** libraries can make outbound calls you didn't ask for — audit startup logs.
+
+### `Activate.ps1 cannot be loaded because running scripts is disabled`
+- **Cause:** PowerShell execution policy.
+- **Fix:** `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, or skip activation and call `.\.venv\Scripts\python.exe -m ...` directly.
+
 ## Git
 
 ### Push rejected: "GH007: Your push would publish a private email address"

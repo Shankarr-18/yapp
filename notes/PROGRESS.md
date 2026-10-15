@@ -7,7 +7,7 @@ Legend: ✅ done · 🔄 in progress · ⬜ not started
 | # | Lesson | Status | Date | Notes |
 |---|--------|--------|------|-------|
 | 0 | Setup: git init, local identity, remote, .gitignore, notes | ✅ | 2026-10-15 | [git concepts](concepts/git.md) |
-| 1 | App design: modules, config via env vars, logging, errors | ⬜ | | |
+| 1 | App: FastAPI + Gradio, modules, env config, logging, errors, /health | ✅ | 2026-10-15 | [architecture](concepts/app-architecture.md) |
 | 2 | Testing: pytest unit vs integration | ⬜ | | |
 | 3 | Docker: multi-stage, .dockerignore, HEALTHCHECK, non-root | ⬜ | | |
 | 4 | GitHub Actions basics + `ci.yml` (push/PR) | ⬜ | | |

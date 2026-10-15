@@ -1,0 +1,4 @@
+# Runtime dependencies only, pinned for reproducible builds.
+fastapi==0.143.1
+uvicorn==0.54.0
+gradio==6.30.0

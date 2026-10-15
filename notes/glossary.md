@@ -13,6 +13,21 @@
 | Config levels | `system` → `global` → `local`; most specific wins |
 | GCM | Git Credential Manager — stores credentials in Windows Credential Manager |
 
+## Web / API
+| Term | Meaning |
+|------|---------|
+| ASGI | Contract between async Python web apps and servers |
+| uvicorn | ASGI **server** — listens on a port, speaks HTTP |
+| FastAPI | Web **framework** — routing, validation, auto docs |
+| Endpoint / route | URL path + HTTP method handled by a function (`POST /api/v1/emi`) |
+| OpenAPI | Machine-readable API description; powers `/docs` |
+| Pydantic | Data validation via type hints |
+| Status codes | 200 OK · 400 bad input (business rule) · 422 schema invalid · 500 server bug |
+| Liveness / readiness | "Process alive?" / "Ready to take traffic?" |
+| Virtual environment (venv) | Isolated Python packages per project |
+| Pinning | Exact versions in requirements (`==`) for reproducible builds |
+| Telemetry | Usage data a library sends to its vendor |
+
 ## GitHub Actions
 | Term | Meaning |
 |------|---------|

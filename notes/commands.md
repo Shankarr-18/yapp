@@ -19,6 +19,22 @@ git log --oneline --graph        # history
 git push -u origin main          # first push: -u sets upstream so later just `git push`
 ```
 
+## Python / app
+```powershell
+python -m venv .venv                      # create isolated environment
+.\.venv\Scripts\Activate.ps1               # activate it (prompt shows (.venv))
+pip install -r requirements.txt           # install pinned deps
+pip freeze                                # show every installed package + version
+uvicorn app.main:app --reload --port 8000 # run app; --reload = restart on code change (dev only)
+```
+
+## Calling the API from PowerShell
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+Invoke-RestMethod http://127.0.0.1:8000/api/v1/emi -Method Post -ContentType "application/json" `
+  -Body '{"principal":500000,"annual_rate_pct":9,"years":5}'
+```
+
 ## GitHub CLI
 ```powershell
 gh auth status                   # which account(s) is gh logged into
