@@ -43,4 +43,32 @@ Format: **Symptom → Cause → Fix → Lesson**
 
 ### Push fails with 403 / "Permission denied to <other-account>"
 - **Cause:** Cached credentials for a different GitHub account (e.g. work account) are being used.
-- **Fix:** Put the username in the remote URL (`https://Shank8r@github.com/...`) so GCM stores a separate credential, or remove the stale entry in Windows Credential Manager → Windows Credentials → `git:https://github.com`.
+- **Fix:** Put the username in the remote URL (`https://Shankarr-18@github.com/...`) so GCM stores a separate credential, or remove the stale entry in Windows Credential Manager → Windows Credentials → `git:https://github.com`.
+
+### SSH: "The authenticity of host 'github.com' can't be established ... Are you sure you want to continue connecting?"
+- **Cause:** First SSH connection; GitHub's host key isn't in `~/.ssh/known_hosts` yet. (Non-interactive runs fail outright with `Host key verification failed.`)
+- **Fix:** Compare the shown fingerprint with GitHub Docs → "GitHub's SSH key fingerprints" (ED25519: `SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU`), then type `yes`.
+- **Lesson:** Never blindly type `yes`. If you later see `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`, stop — either GitHub rotated its key (check their blog/docs, then `ssh-keygen -R github.com`) or someone is intercepting.
+
+### SSH: `Permission denied (publickey)`
+- **Cause:** Git used a different key (or none). On a shared account, ssh may offer other people's keys.
+- **Fix:** `git config --local core.sshCommand "ssh -i ~/.ssh/yapp_deploy_key -o IdentitiesOnly=yes"`; test with `ssh -i ~/.ssh/yapp_deploy_key -o IdentitiesOnly=yes -T git@github.com`. Check the public key is added under the repo's Deploy keys.
+
+### Push: `ERROR: The key you are authenticating with has been marked as read only`
+- **Cause:** Deploy key added without **Allow write access**.
+- **Fix:** Repo Settings → Deploy keys → delete and re-add with write access ticked.
+
+### Commits show the old author (Shank8r) after renaming the account
+- **Cause:** Author is stamped into each commit when it's created; changing `user.name`/`user.email` only affects new commits.
+- **Fix (unpushed only):** set the new local identity, then `git rebase --root --exec "git commit --amend --no-edit --reset-author"`. Verify with `git log --format='%an <%ae>'`.
+
+## Ports / networking
+
+### `[Errno 98] Address already in use` / port 8000 busy
+- **Cause:** Another team's container publishes host port 8000 (`docker ps` PORTS shows `0.0.0.0:8000->8000/tcp`).
+- **Fix:** Use **8500** for yapp (`--port 8500`, `-p 8500:8000`). Never stop someone else's container.
+- Diagnose: `ss -tlnp | grep ':8000'`, `docker ps --format 'table {{.Names}}\t{{.Ports}}'`.
+
+### App works with `curl` on the server but not from another machine
+- **Cause:** uvicorn binds `127.0.0.1` by default = loopback only.
+- **Fix:** For dev, keep `127.0.0.1` and use VS Code port forwarding / SSH tunnel. Use `--host 0.0.0.0` only when it must be reachable on the network (and inside containers — see Lesson 3).

@@ -2,13 +2,15 @@
 
 Legend: ✅ done · 🔄 in progress · ⬜ not started
 
+**Current lesson: 2 — Testing (pytest).** Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp`.
+
 ## Phase 1 — Python, Streamlit, Testing, Docker, GitHub Actions
 
 | # | Lesson | Status | Date | Notes |
 |---|--------|--------|------|-------|
 | 0 | Setup: git init, local identity, remote, .gitignore, notes | ✅ | 2026-10-15 | [git concepts](concepts/git.md) |
 | 1 | App: FastAPI + Gradio, modules, env config, logging, errors, /health | ✅ | 2026-10-15 | [architecture](concepts/app-architecture.md) |
-| 2 | Testing: pytest unit vs integration | ⬜ | | |
+| 2 | Testing: pytest unit vs integration | 🔄 | 2026-10-15 | |
 | 3 | Docker: multi-stage, .dockerignore, HEALTHCHECK, non-root | ⬜ | | |
 | 4 | GitHub Actions basics + `ci.yml` (push/PR) | ⬜ | | |
 | 5 | Secrets vs Variables, Docker Hub push, tagging/SemVer | ⬜ | | |
@@ -31,3 +33,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ not started
 | Private IP, NAT, outbound vs inbound, self-hosted runners behind firewalls | 2026-10-15 | [networking](concepts/networking.md) |
 | TLS inspection (Zscaler): cert trust error vs policy block | 2026-10-15 | [troubleshooting](troubleshooting.md) |
 | Containers vs VMs, nested virtualization | 2026-10-15 | [troubleshooting](troubleshooting.md) |
+| Moved repo to Linux (scp), first push with a repo-scoped deploy key, SSH host key verification, `core.sshCommand` | 2026-10-15 | [git concepts](concepts/git.md) |
+| Rewriting unpushed commits: `git rebase --root --exec` (author rename to Shankarr-18) | 2026-10-15 | [git concepts](concepts/git.md) |
+| Reading `docker ps` ports, bind address `0.0.0.0` vs `127.0.0.1`, picking port 8500 | 2026-10-15 | [networking](concepts/networking.md) |

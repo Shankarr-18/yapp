@@ -1,9 +1,15 @@
 # Copilot instructions — yapp learning project
 
 ## Who / what
-- Owner: Shank8r (personal GitHub). Long-term hands-on learning repo for CI/CD, Docker, Kubernetes, Cloud, MLOps, Agentic AI.
-- App: **yapp — Personal Finance Toolkit** (Loan EMI, SIP planner, Budget analyzer). FastAPI REST API + Gradio UI mounted at `/ui`, one uvicorn process on port 8000, `/health` endpoint. See [README.md](../README.md) and [notes/concepts/app-architecture.md](../notes/concepts/app-architecture.md).
+- Owner: **Shankarr-18** (personal GitHub), commit email `shankarhm1874@gmail.com`. Long-term hands-on learning repo for CI/CD, Docker, Kubernetes, Cloud, MLOps, Agentic AI.
+- Repo: `git@github.com:Shankarr-18/yapp.git`, branch `main`.
+- App: **yapp — Personal Finance Toolkit** (Loan EMI, SIP planner, Budget analyzer). FastAPI REST API + Gradio UI mounted at `/ui`, one uvicorn process (app port 8000 inside a container), `/health` endpoint. See [README.md](../README.md) and [notes/concepts/app-architecture.md](../notes/concepts/app-architecture.md).
 - Progress tracker: [notes/PROGRESS.md](../notes/PROGRESS.md). Read it first to know the current lesson.
+
+## Machines
+- **Linux dev machine** (Ubuntu 24.04, shared `jarvis` account): repo at `/home/jarvis/shankar/yapp`. All coding, git, docker happen here. Use bash commands, not PowerShell.
+- **Windows VM 10.20.40.111** (via RDP): only for the GitHub web UI (Settings, Actions runs, Secrets).
+- **Host port for yapp on this machine: 8500** (8000 is taken by another team's container). Local runs: `uvicorn ... --port 8500`; containers: `-p 8500:8000`.
 
 ## How to work with the user (mentor mode)
 - TEACH FIRST, implement second. Before each file/command: what it is, why it exists, real-world use, alternatives, best practices, common mistakes, how to verify.
@@ -18,8 +24,8 @@
 
 ## SHARED SERVER SAFETY (Linux dev machine, shared `jarvis` account)
 - NEVER stop, remove, or prune containers/images/volumes/networks that are not ours. Forbidden: `docker system prune`, `docker * prune`, `docker stop $(docker ps -q)`, `docker rm -f` on non-yapp containers.
-- Everything we create is prefixed `yapp-` (container names, compose project name `yapp`, image `shank8r/yapp`). Only stop/remove by exact `yapp-*` name.
-- Check a port is free before using it (`ss -tlnp`); 8000 may be taken by others.
-- Git identity: `git config --local` only, never `--global`.
-- GitHub auth: repo-scoped **deploy key** with a passphrase, not a personal account key. Never ask the user to paste tokens/keys into chat.
+- Everything we create is prefixed `yapp-` (container names, compose project name `yapp`, image `<dockerhub-user>/yapp` — Docker Hub user decided in Lesson 5). Only stop/remove by exact `yapp-*` name.
+- Check a port is free before using it (`ss -tlnp`); use **8500**, never 8000.
+- Git identity and settings: `git config --local` only, never `--global`.
+- GitHub auth: repo-scoped **deploy key** `~/.ssh/yapp_deploy_key` (with passphrase, write access), wired in via `git config --local core.sshCommand "ssh -i ~/.ssh/yapp_deploy_key -o IdentitiesOnly=yes"`. Don't touch `~/.ssh/config` or other keys in `~/.ssh` (shared account). `git push` prompts for the passphrase — the user types it in the terminal. Never ask the user to paste tokens/keys/passphrases into chat.
 - Ask before any destructive or irreversible action.

@@ -1,10 +1,12 @@
 # Commands Reference
 
+> Dev machine is now **Linux (bash)**. PowerShell blocks below are from the Windows days.
+
 ## Git — setup
 ```powershell
 git init -b main                                   # new repo, default branch "main"
-git config --local user.name  "Shank8r"            # identity for THIS repo only
-git config --local user.email "you@example.com"
+git config --local user.name  "Shankarr-18"        # identity for THIS repo only
+git config --local user.email "shankarhm1874@gmail.com"
 git config --list --show-origin                    # see every setting + which file it came from
 git remote add origin https://<user>@github.com/<user>/<repo>.git   # <user>@ makes GCM keep a per-account credential
 git remote -v                                      # list remotes
@@ -38,4 +40,47 @@ Invoke-RestMethod http://127.0.0.1:8000/api/v1/emi -Method Post -ContentType "ap
 ## GitHub CLI
 ```powershell
 gh auth status                   # which account(s) is gh logged into
+```
+
+## SSH deploy key (Linux)
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/yapp_deploy_key -C "yapp deploy key"   # make key pair; set a passphrase
+cat ~/.ssh/yapp_deploy_key.pub        # PUBLIC half -> repo Settings -> Deploy keys (tick Allow write access)
+ssh -i ~/.ssh/yapp_deploy_key -o IdentitiesOnly=yes -T git@github.com  # test: "Hi Shankarr-18/yapp! ..."
+git config --local core.sshCommand "ssh -i ~/.ssh/yapp_deploy_key -o IdentitiesOnly=yes"  # use this key for THIS repo
+git remote set-url origin git@github.com:Shankarr-18/yapp.git          # switch remote HTTPS -> SSH
+ssh-keygen -lf ~/.ssh/known_hosts     # list fingerprints of hosts you've trusted
+ssh-keygen -R github.com              # forget a host key (only if GitHub officially rotated it)
+eval "$(ssh-agent -s)" && ssh-add -t 1h ~/.ssh/yapp_deploy_key  # optional: cache passphrase for 1 hour
+```
+
+## Git — rewrite unpushed history
+```bash
+git rebase --root --exec "git commit --amend --no-edit --reset-author"  # re-stamp EVERY commit with current local identity
+git log --format='%h %an <%ae> %s'    # verify author on each commit
+```
+Only before pushing. After a push this needs `git push --force-with-lease` and breaks other clones.
+
+## Copy files between machines
+```bash
+scp -r ./yapp jarvis@<linux-host>:/home/jarvis/shankar/   # copy folder over SSH (-r = recursive)
+scp -P 2222 file user@host:/path/                         # non-default SSH port (capital -P)
+rsync -av --exclude .venv ./yapp user@host:/path/         # alternative: incremental + excludes
+```
+
+## Ports & containers (shared server — read-only checks)
+```bash
+ss -tlnp                         # who is LISTENing on which TCP port (-t tcp, -l listen, -n numeric, -p process)
+ss -tlnp | grep ':8500'          # is our port free?
+docker ps                        # running containers; read the PORTS column
+docker ps --format 'table {{.Names}}\t{{.Ports}}'   # just names + ports
+```
+
+## Python / app (Linux)
+```bash
+python3 -m venv .venv                     # create isolated environment
+source .venv/bin/activate                 # activate (prompt shows (.venv)); `deactivate` to leave
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8500 # 127.0.0.1 by default = only this machine (VS Code forwards the port)
+curl -s http://127.0.0.1:8500/health
 ```

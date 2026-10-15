@@ -12,6 +12,25 @@
 | Authentication | Proof you may push (GCM login, PAT, SSH key) — **verified** |
 | Config levels | `system` → `global` → `local`; most specific wins |
 | GCM | Git Credential Manager — stores credentials in Windows Credential Manager |
+| Rebase | Replay commits on a new base, creating **new** commits (new hashes) |
+| `rebase --root --exec` | Replay every commit from the first one, running a command after each |
+| Force push | Overwrite remote history; prefer `--force-with-lease` (refuses if remote moved) |
+| `core.sshCommand` | Per-repo override of the `ssh` command Git uses (e.g. which key) |
+
+## SSH
+| Term | Meaning |
+|------|---------|
+| Key pair | Private key (stays on your machine) + public key (given to the server) |
+| ed25519 | Modern, short, fast key type — default choice today |
+| Passphrase | Password that encrypts the private key file on disk |
+| ssh-agent | Background process that holds decrypted keys so you type the passphrase once |
+| Deploy key | SSH public key attached to **one repository**, read-only or read/write; not tied to a user |
+| Host key | Server's own key pair; proves the server is the real one |
+| Fingerprint | Short hash of a key (`SHA256:...`) for human comparison |
+| `known_hosts` | `~/.ssh/known_hosts` — host keys you've already trusted |
+| MITM | Man-in-the-middle: attacker pretending to be the server |
+| `IdentitiesOnly=yes` | Offer only the key given with `-i`, not every key in the agent/`~/.ssh` |
+| scp | Secure copy — copy files over SSH |
 
 ## Web / API
 | Term | Meaning |
@@ -39,6 +58,10 @@
 | Port forwarding / SSH tunnel | Carry traffic for a remote port through an existing SSH connection |
 | Headless | Machine with no GUI/desktop, terminal-only (typical server) |
 | TLS inspection | Proxy decrypts/re-encrypts HTTPS with its own CA (e.g. Zscaler) |
+| Bind address | Which local interface a server listens on |
+| Loopback (`127.0.0.1`, `::1`) | Same-machine-only interface |
+| `0.0.0.0` / `::` | "All interfaces" — reachable from the network |
+| Listening socket | A process waiting for connections on IP:port (`ss -tlnp`) |
 
 ## GitHub Actions
 | Term | Meaning |
@@ -63,6 +86,7 @@
 | Container | A running instance of an image |
 | Layer | Cached filesystem change produced by one Dockerfile instruction |
 | Registry | Server that stores images (Docker Hub, GHCR, ECR, ACR) |
-| Repository | Named collection of image versions in a registry (`shank8r/yapp`) |
+| Repository | Named collection of image versions in a registry (`<dockerhub-user>/yapp`) |
+| Port publishing | `-p HOST:CONTAINER` — map a host port to a container port (`-p 8500:8000`) |
 | Tag | Human-friendly, **mutable** label (`:1.0.0`, `:latest`) |
 | Digest | Immutable content hash (`sha256:...`) — the exact image |
