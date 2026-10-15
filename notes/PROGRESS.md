@@ -28,3 +28,6 @@ Legend: ✅ done · 🔄 in progress · ⬜ not started
 ## Extra topics learned outside the plan
 | Topic | Date | Notes |
 |-------|------|-------|
+| Private IP, NAT, outbound vs inbound, self-hosted runners behind firewalls | 2026-10-15 | [networking](concepts/networking.md) |
+| TLS inspection (Zscaler): cert trust error vs policy block | 2026-10-15 | [troubleshooting](troubleshooting.md) |
+| Containers vs VMs, nested virtualization | 2026-10-15 | [troubleshooting](troubleshooting.md) |

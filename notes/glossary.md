@@ -28,6 +28,18 @@
 | Pinning | Exact versions in requirements (`==`) for reproducible builds |
 | Telemetry | Usage data a library sends to its vendor |
 
+## Networking
+| Term | Meaning |
+|------|---------|
+| Private IP | Address valid only inside a network (`10.x`, `172.16-31.x`, `192.168.x`) |
+| NAT | Router rewrites private → public IP for outbound traffic |
+| Outbound / egress | Connection started by your machine |
+| Inbound / ingress | Connection started by someone else to your machine |
+| Stateful firewall | Allows replies to connections you started, blocks unsolicited inbound |
+| Port forwarding / SSH tunnel | Carry traffic for a remote port through an existing SSH connection |
+| Headless | Machine with no GUI/desktop, terminal-only (typical server) |
+| TLS inspection | Proxy decrypts/re-encrypts HTTPS with its own CA (e.g. Zscaler) |
+
 ## GitHub Actions
 | Term | Meaning |
 |------|---------|
