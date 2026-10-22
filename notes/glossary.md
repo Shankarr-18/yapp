@@ -79,6 +79,28 @@
 | Artifact | Files persisted from a run for download |
 | Job summary | Markdown written to `$GITHUB_STEP_SUMMARY`, shown on the run page |
 
+## Testing
+| Term | Meaning |
+|------|---------|
+| Unit test | Tests one function in isolation (our `app/core/*`) — fast, precise |
+| Integration test | Tests parts working together (HTTP → FastAPI → core → JSON) |
+| E2E test | Drives the real UI/system like a user (browser) — slow, brittle |
+| Test pyramid | Many unit, fewer integration, very few E2E |
+| Test discovery | pytest finds `test_*.py` files and `test_*` functions |
+| Collection error | Test file couldn't be imported — nothing ran (exit code 2) |
+| Failure vs error | `F` = assertion/exception in the test · `E` = setup/fixture problem |
+| Node ID | `file::function[params]` — address of one test case |
+| Fixture | Reusable setup injected by parameter name; `yield` = setup/teardown |
+| Fixture scope | `function` (default, fresh each test) · `module` · `session` (once per run) |
+| `conftest.py` | Auto-loaded file sharing fixtures with tests in its folder |
+| Parametrize | One test function → many cases (`@pytest.mark.parametrize`) |
+| `monkeypatch` | Built-in fixture to temporarily change env vars/attributes; auto-restored |
+| `pytest.approx` | Float comparison with tolerance |
+| Oracle | Independent source of the expected answer (textbook value, closed-form formula) |
+| Boundary value | Test exactly at the limit (0, 100, 50) — catches off-by-one |
+| Coverage (line / branch) | Which lines / which `if` sides ran during tests — not proof of correctness |
+| `TestClient` | Calls the ASGI app in-process over httpx — no server, no port |
+
 ## Docker
 | Term | Meaning |
 |------|---------|
@@ -86,7 +108,7 @@
 | Container | A running instance of an image |
 | Layer | Cached filesystem change produced by one Dockerfile instruction |
 | Registry | Server that stores images (Docker Hub, GHCR, ECR, ACR) |
-| Repository | Named collection of image versions in a registry (`<dockerhub-user>/yapp`) |
+| Repository | Named collection of image versions in a registry (`shankar180/yapp`) |
 | Port publishing | `-p HOST:CONTAINER` — map a host port to a container port (`-p 8500:8000`) |
 | Tag | Human-friendly, **mutable** label (`:1.0.0`, `:latest`) |
 | Digest | Immutable content hash (`sha256:...`) — the exact image |

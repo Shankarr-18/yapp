@@ -32,15 +32,24 @@ One uvicorn process serves the REST API (FastAPI) and the web UI (Gradio, mounte
 | `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL` |
 | `CURRENCY` | `INR` | any label |
 
-## Local development (Windows PowerShell)
+## Local development (Linux)
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt     # runtime + test tools
+uvicorn app.main:app --reload --port 8500
 ```
-Open http://127.0.0.1:8000/ui — try the Budget tab with [samples/expenses_sample.csv](samples/expenses_sample.csv).
+Open http://127.0.0.1:8500/ui — try the Budget tab with [samples/expenses_sample.csv](samples/expenses_sample.csv).
+
+## Tests
+
+```bash
+pytest                                  # everything (unit + integration)
+pytest tests/unit                       # fast: pure business logic, no FastAPI/Gradio
+pytest tests/integration                # HTTP API via FastAPI TestClient (in-process, no port)
+pytest --cov=app --cov-branch --cov-report=term-missing   # coverage
+```
 
 ## Roadmap
 Docker → CI/CD (GitHub Actions + Docker Hub) → Compose & DB → Kubernetes → Cloud & Terraform → Observability → MLOps → Agentic AI.

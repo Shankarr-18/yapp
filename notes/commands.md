@@ -76,11 +76,25 @@ docker ps                        # running containers; read the PORTS column
 docker ps --format 'table {{.Names}}\t{{.Ports}}'   # just names + ports
 ```
 
+## Testing (pytest)
+```bash
+pip install -r requirements-dev.txt     # runtime + pytest, pytest-cov, httpx
+pytest                                  # all tests (config in pyproject.toml)
+pytest -v / -q                          # verbose (one line per test) / quiet (dots)
+pytest tests/unit                       # only the fast tests
+pytest "tests/unit/test_emi.py::test_known_textbook_value"   # one test by node ID
+pytest -k "invalid and Tenure"          # filter by name expression
+pytest --durations=5                    # slowest phases
+time pytest -q                          # real wall-clock (pytest's "in Xs" may miss conftests loaded before the session starts)
+pytest --cov=app --cov-branch --cov-report=term-missing     # coverage + missing lines
+```
+
 ## Python / app (Linux)
 ```bash
 python3 -m venv .venv                     # create isolated environment
 source .venv/bin/activate                 # activate (prompt shows (.venv)); `deactivate` to leave
 pip install -r requirements.txt
+pip index versions <pkg>                  # latest versions on PyPI (to pin)
 uvicorn app.main:app --reload --port 8500 # 127.0.0.1 by default = only this machine (VS Code forwards the port)
 curl -s http://127.0.0.1:8500/health
 ```

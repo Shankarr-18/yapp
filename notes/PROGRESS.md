@@ -2,21 +2,22 @@
 
 Legend: ✅ done · 🔄 in progress · ⬜ not started
 
-**Current lesson: 2 — Testing (pytest).** Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp`.
+**Current lesson: 3 — Dockerfile.** Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
 
-## Phase 1 — Python, Streamlit, Testing, Docker, GitHub Actions
+## Assignment (from roommate)
+Dockerfile · 3 workflows: **automatic** (push/PR), **manual** (deployment), **cron** · build + push to Docker Hub · GitHub Secrets + Variables · workflow **outputs** · **job summary** on the run page · lint checks.
+
+## Phase 1 — Python, Testing, Docker, GitHub Actions
 
 | # | Lesson | Status | Date | Notes |
 |---|--------|--------|------|-------|
 | 0 | Setup: git init, local identity, remote, .gitignore, notes | ✅ | 2026-10-15 | [git concepts](concepts/git.md) |
 | 1 | App: FastAPI + Gradio, modules, env config, logging, errors, /health | ✅ | 2026-10-15 | [architecture](concepts/app-architecture.md) |
-| 2 | Testing: pytest unit vs integration | 🔄 | 2026-10-15 | |
-| 3 | Docker: multi-stage, .dockerignore, HEALTHCHECK, non-root | ⬜ | | |
-| 4 | GitHub Actions basics + `ci.yml` (push/PR) | ⬜ | | |
-| 5 | Secrets vs Variables, Docker Hub push, tagging/SemVer | ⬜ | | |
-| 6 | `deploy.yml` — manual `workflow_dispatch` + environments | ⬜ | | |
-| 7 | `scheduled.yml` — cron checks | ⬜ | | |
-| 8 | Job summaries (`$GITHUB_STEP_SUMMARY`) + job outputs | ⬜ | | |
+| 2 | Testing: pytest unit vs integration, fixtures, monkeypatch, coverage | ✅ | 2026-10-22 | [testing](concepts/testing.md) |
+| 3 | Docker: multi-stage, .dockerignore, HEALTHCHECK, non-root, run on :8500 | ⬜ | | |
+| 4 | `ci.yml` (automatic): ruff lint → pytest → build → push to Docker Hub on `main`; Secrets vs Variables; reusable workflow with outputs; job summary | ⬜ | | |
+| 5 | Manual deployment (`workflow_dispatch`): SemVer release tags, Environment approval, self-hosted runner deploys to this Linux server on :8500 | ⬜ | | |
+| 6 | `scheduled.yml` (cron): pull `:latest`, run, `/health`, vulnerability scan, summary | ⬜ | | |
 
 ## Phase 2 — Docker Compose, multiple services, databases
 ⬜ Branching strategy: introduce `dev` branch + PR flow

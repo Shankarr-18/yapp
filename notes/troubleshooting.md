@@ -4,6 +4,19 @@ Format: **Symptom → Cause → Fix → Lesson**
 
 ## App
 
+### pytest: `ModuleNotFoundError: No module named 'app'` (collection error, 0 tests ran)
+- **Cause:** `tests/unit/` has no `__init__.py`, so pytest puts `tests/unit/` (not the project root) on `sys.path`.
+- **Fix:** `pythonpath = ["."]` under `[tool.pytest.ini_options]` in `pyproject.toml`. (`python -m pytest` also works but only if everyone remembers.)
+- **Lesson:** never hack `sys.path` inside tests — fix it in config so IDE, CLI and CI behave the same.
+
+### Tests pass alone but fail together (or depend on your shell)
+- **Cause:** a test set `os.environ[...]` directly (leaks into later tests), or the code caches config (`@lru_cache get_settings`) so a changed env var is ignored; or a test asserts on a value from the developer's environment.
+- **Fix:** `monkeypatch.setenv/delenv` (auto-restored); call the uncached `load_settings()` or `get_settings.cache_clear()`; assert allowed values, not "dev".
+
+### Ubuntu: `error: externally-managed-environment` on `pip install`
+- **Cause:** PEP 668 — system Python is managed by apt.
+- **Fix:** `python3 -m venv .venv && source .venv/bin/activate`. Never `sudo pip`.
+
 ### Logs show `HTTP Request: ... huggingface.co ... 403 Forbidden` at startup
 - **Cause:** Gradio sends usage telemetry by default; corporate network blocks it.
 - **Fix:** `GRADIO_ANALYTICS_ENABLED=False` set in `app/__init__.py` before gradio is imported.
