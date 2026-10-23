@@ -89,6 +89,23 @@ time pytest -q                          # real wall-clock (pytest's "in Xs" may 
 pytest --cov=app --cov-branch --cov-report=term-missing     # coverage + missing lines
 ```
 
+## Lint (ruff — config in pyproject.toml)
+```bash
+ruff check .                     # lint (exit 1 if problems)
+ruff check --fix .               # auto-fix safe issues
+ruff format --check .            # would anything be reformatted? (CI uses this)
+ruff format .                    # reformat files
+```
+
+## CI status from the terminal (public repo, read-only, no auth)
+```bash
+curl -s "https://api.github.com/repos/Shankarr-18/yapp/actions/runs?per_page=1"        # latest run
+curl -s "https://api.github.com/repos/Shankarr-18/yapp/actions/runs/<run_id>/jobs"     # jobs + steps
+curl -s "https://hub.docker.com/v2/repositories/shankar180/yapp/tags"                  # tags + digests
+docker buildx imagetools inspect shankar180/yapp:main                                  # digest of a tag
+python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"             # YAML syntax check
+```
+
 ## Docker (only ever touch `yapp*` names)
 ```bash
 docker buildx imagetools inspect python:3.12-slim-trixie   # does a tag exist? digest? (no download)

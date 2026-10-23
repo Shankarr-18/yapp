@@ -81,6 +81,15 @@
 | Environment | Named deploy target (dev/prod) with own secrets + protection rules (required reviewers) |
 | Artifact | Files persisted from a run for download |
 | Job summary | Markdown written to `$GITHUB_STEP_SUMMARY`, shown on the run page |
+| `needs:` | Job dependency: order + skip if the needed job failed |
+| Step / job output | Value a step exposes (`steps.<id>.outputs.x`) / a job exposes to later jobs (`needs.<job>.outputs.x`) |
+| `GITHUB_TOKEN` / `permissions:` | Auto token per run / limits what it may do (least privilege) |
+| `concurrency` | Limit to one run per group; optionally cancel older runs |
+| `paths-ignore` | Don't trigger when only these paths changed |
+| Smoke test | Quick "does it start and answer?" check on the built artifact |
+| Linter / formatter | Finds code problems without running it / rewrites layout consistently (ruff does both) |
+| Annotation | Error/warning shown on a file line in GitHub UI (`::error::`, `--output-format=github`) |
+| Personal access token (Docker Hub) | Scoped, revocable password substitute for automation; works with 2FA |
 
 ## Testing
 | Term | Meaning |
@@ -113,8 +122,8 @@
 | Registry | Server that stores images (Docker Hub, GHCR, ECR, ACR) |
 | Repository | Named collection of image versions in a registry (`shankar180/yapp`) |
 | Port publishing | `-p HOST:CONTAINER` — map a host port to a container port (`-p 8500:8000`) |
-| Tag | Human-friendly, **mutable** label (`:1.0.0`, `:latest`) |
-| Digest | Immutable content hash (`sha256:...`) — the exact image |
+| Tag | Human-friendly, **mutable** label (`:1.0.0`, `:latest`) — a sticky note that can move |
+| Digest | Immutable content hash (`sha256:...`) — the exact image, its fingerprint |
 | Dockerfile | Text recipe of build steps (`FROM`, `RUN`, `COPY`, `USER`, `CMD`) |
 | Build context | Folder sent to the builder (`.`); `COPY` can only see files in it |
 | `.dockerignore` | Excludes files from the build context (`.git`, `.venv`, `.env`, tests) |
