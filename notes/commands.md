@@ -89,6 +89,23 @@ time pytest -q                          # real wall-clock (pytest's "in Xs" may 
 pytest --cov=app --cov-branch --cov-report=term-missing     # coverage + missing lines
 ```
 
+## Docker (only ever touch `yapp*` names)
+```bash
+docker buildx imagetools inspect python:3.12-slim-trixie   # does a tag exist? digest? (no download)
+docker build -t yapp:dev .                       # build image from ./Dockerfile, context = .
+docker images yapp                               # our images: disk usage vs content (compressed) size
+docker history yapp:dev                          # layers and their sizes
+ss -tlnp | grep -q ':8500 ' && echo BUSY || docker run -d --name yapp-dev -p 127.0.0.1:8500:8000 yapp:dev
+docker ps --filter name=^yapp-dev$               # status (healthy?) + ports
+docker logs yapp-dev                             # app stdout/stderr
+docker logs -f yapp-dev                          # follow live (Ctrl+C to stop following)
+docker exec yapp-dev id                          # run a command inside: which user?
+docker exec -it yapp-dev sh                      # shell inside (exit to leave)
+docker run --rm -e APP_ENV=prod ...              # config at runtime; --rm = auto-delete on exit
+docker rm -f yapp-dev                            # stop + remove OUR container by exact name
+```
+Never: `docker system prune`, `docker * prune`, `docker stop $(docker ps -q)` — shared server.
+
 ## Python / app (Linux)
 ```bash
 python3 -m venv .venv                     # create isolated environment

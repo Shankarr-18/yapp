@@ -49,6 +49,25 @@ flowchart LR
 
 Format is `HOST_IP:HOST_PORT->CONTAINER_PORT/proto`. Only the **host** port must be unique per machine; many containers can use 8000 internally. That's why yapp keeps 8000 inside and uses `-p 8500:8000`.
 
+## Runners and our network (the big picture)
+Analogy: our server is a flat inside a **gated complex** (private IP `10.x` behind NAT/firewall). Going **out** is allowed; strangers **can't come in**.
+
+| Step | Runs on | Needs to reach | Works? |
+|---|---|---|---|
+| lint, test, build, push to Docker Hub | GitHub-hosted runner (GitHub's cloud) | Docker Hub (internet) | ✅ cloud → cloud, our network not involved |
+| deploy (run on our server) | must be **self-hosted** runner on our server | our server | ✅ only because the runner calls GitHub **outbound** and asks for work |
+| deploy via GitHub-hosted runner SSHing in | GitHub's cloud | our server (inbound) | ❌ blocked by the gate |
+
+**Public repo + self-hosted runner risk:** a stranger forks, edits a workflow (`runs-on: self-hosted`), opens a PR → PR workflows use **their** file → their code could run on our shared server. Locks: require approval for fork-PR workflows (main lock; read the diff before approving), only manual jobs target our runner, Environment approval. GitHub-hosted runs of fork PRs get no secrets and are throwaway — low risk.
+
+## Container networking
+```mermaid
+flowchart LR
+    CURL["curl on server"] -->|127.0.0.1:8500| MAP["Docker port mapping"] -->|from 172.17.0.1| APP["uvicorn :8000 in container"]
+    HC["HEALTHCHECK inside"] -->|127.0.0.1:8000| APP
+```
+Containers sit on Docker's private bridge network (`docker0`, gateway `172.17.0.1`). Forwarded traffic arrives on the container's interface, not loopback → the app must bind `0.0.0.0` inside the container.
+
 ## Checks
 ```bash
 curl -sI https://github.com | head -1

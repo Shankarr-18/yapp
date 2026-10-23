@@ -73,6 +73,9 @@
 | Step | One `run:` command or one `uses:` action inside a job |
 | Action | Reusable packaged step, e.g. `actions/checkout@v4` |
 | Runner | Machine that executes a job. GitHub-hosted (fresh VM, discarded) or self-hosted |
+| GitHub-hosted runner | Temporary VM in GitHub's cloud; reaches the internet (Docker Hub) but not our private network |
+| Self-hosted runner | GitHub's agent installed on our machine; polls GitHub **outbound** for jobs — needed to deploy inside a private network |
+| Fork / pull request | A stranger's copy of the repo / a request to merge their changes; PR workflows run **their** workflow file |
 | Secret | Encrypted value, masked in logs: `${{ secrets.X }}` |
 | Variable | Plain-text config value: `${{ vars.X }}` |
 | Environment | Named deploy target (dev/prod) with own secrets + protection rules (required reviewers) |
@@ -112,3 +115,19 @@
 | Port publishing | `-p HOST:CONTAINER` — map a host port to a container port (`-p 8500:8000`) |
 | Tag | Human-friendly, **mutable** label (`:1.0.0`, `:latest`) |
 | Digest | Immutable content hash (`sha256:...`) — the exact image |
+| Dockerfile | Text recipe of build steps (`FROM`, `RUN`, `COPY`, `USER`, `CMD`) |
+| Build context | Folder sent to the builder (`.`); `COPY` can only see files in it |
+| `.dockerignore` | Excludes files from the build context (`.git`, `.venv`, `.env`, tests) |
+| Base image | Starting filesystem (`python:3.12-slim-trixie`) |
+| Multi-stage build | Several `FROM`s; build in one stage, copy only results into the final one |
+| Layer cache | Unchanged steps are reused; a changed step rebuilds everything after it |
+| BuildKit | Docker's modern build engine (parallel stages, cache, attestations) |
+| `EXPOSE` | Documents the container port — does **not** publish it |
+| `HEALTHCHECK` | Command Docker runs periodically → `(healthy)` / `(unhealthy)` |
+| Exec form vs shell form | `CMD ["uvicorn", ...]` (PID 1, gets signals) vs `CMD uvicorn ...` (wrapped in `/bin/sh`) |
+| PID 1 | First process in the container; must handle `SIGTERM` for graceful stop |
+| Detached (`-d`) | Container runs in the background |
+| Bridge network (`docker0`) | Containers' private network; host reaches them via gateway `172.17.0.1` |
+| Image index | One tag covering multiple CPU architectures (amd64, arm64) |
+| Content size vs disk usage | Compressed (transferred to/from registry) vs unpacked on disk |
+| Transitive dependency | A dependency of your dependency (Gradio → pandas, numpy) |
