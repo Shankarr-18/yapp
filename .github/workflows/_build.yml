@@ -34,7 +34,7 @@ permissions:
 jobs:
   build:
     name: Build, smoke-test, push
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       IMAGE: docker.io/${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
