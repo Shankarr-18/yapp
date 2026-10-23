@@ -87,6 +87,15 @@
 | `concurrency` | Limit to one run per group; optionally cancel older runs |
 | `paths-ignore` | Don't trigger when only these paths changed |
 | Smoke test | Quick "does it start and answer?" check on the built artifact |
+| Reusable workflow | Workflow with `on: workflow_call`; called via `jobs.<id>.uses:`, takes `inputs`/`secrets`, returns workflow `outputs` (like a function) |
+| `workflow_dispatch` | Manual trigger: "Run workflow" button with `inputs` form fields |
+| Environment protection rules | Required reviewers, branch restrictions, wait timer — a job with `environment:` pauses until satisfied |
+| Deployment (GitHub) | Record created when a job with `environment:` runs; shown under repo → Deployments |
+| Script injection | `${{ }}` is pasted into the script before bash runs → untrusted text can become commands; pass via `env:` |
+| SemVer | `MAJOR.MINOR.PATCH`: breaking / feature / fix |
+| Immutable release tag | A version tag is never re-pushed; a new build gets a new version |
+| Build once, promote | Re-tag the already-tested image for release instead of rebuilding (same digest test → prod) |
+| Runner image label | `ubuntu-latest` (moving) vs `ubuntu-24.04` (pinned) |
 | Linter / formatter | Finds code problems without running it / rewrites layout consistently (ruff does both) |
 | Annotation | Error/warning shown on a file line in GitHub UI (`::error::`, `--output-format=github`) |
 | Personal access token (Docker Hub) | Scoped, revocable password substitute for automation; works with 2FA |
