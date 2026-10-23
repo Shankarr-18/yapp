@@ -1,0 +1,32 @@
+# Accepted vulnerabilities (risk exceptions). Each entry expires; Trivy reports it again after that date.
+#
+# 2026-10-23 — pillow 12.3.0 (transitive, via gradio). Fixed in pillow 13.0.0, but gradio 6.30.0
+# (latest) requires pillow<13. Exploits need a malicious image to be processed; yapp has no image
+# features (CSV upload only). Revisit when gradio allows pillow>=13: bump, rebuild, release, delete these.
+CVE-2026-96637 exp:2026-11-23
+CVE-2026-96639 exp:2026-11-23
+CVE-2026-96640 exp:2026-11-23
+CVE-2026-96642 exp:2026-11-23
+CVE-2026-96643 exp:2026-11-23
+CVE-2026-96644 exp:2026-11-23
+CVE-2026-96778 exp:2026-11-23
+CVE-2026-112390 exp:2026-11-23
+CVE-2026-112392 exp:2026-11-23
+CVE-2026-112393 exp:2026-11-23
+CVE-2026-112397 exp:2026-11-23
+CVE-2026-112399 exp:2026-11-23
+CVE-2026-112400 exp:2026-11-23
+CVE-2026-112402 exp:2026-11-23
+CVE-2026-112403 exp:2026-11-23
+CVE-2026-112404 exp:2026-11-23
+CVE-2026-112405 exp:2026-11-23
+CVE-2026-112406 exp:2026-11-23
+CVE-2026-112892 exp:2026-11-23
+CVE-2026-112893 exp:2026-11-23
+CVE-2026-112894 exp:2026-11-23
+CVE-2026-112895 exp:2026-11-23
+CVE-2026-112896 exp:2026-11-23
+CVE-2026-112897 exp:2026-11-23
+CVE-2026-112900 exp:2026-11-23
+CVE-2026-112902 exp:2026-11-23
+GHSA-78g4-xqwv-q3g8 exp:2026-11-23
