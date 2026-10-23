@@ -96,6 +96,11 @@
 | Immutable release tag | A version tag is never re-pushed; a new build gets a new version |
 | Build once, promote | Re-tag the already-tested image for release instead of rebuilding (same digest test → prod) |
 | Runner image label | `ubuntu-latest` (moving) vs `ubuntu-24.04` (pinned) |
+| `schedule` / cron | Time-based trigger; 5 fields `min hour day month weekday`, always UTC |
+| `$GITHUB_OUTPUT` | File a step writes `name=value` to → `steps.<id>.outputs.name` |
+| `steps.<id>.outcome` | Result of a step before `continue-on-error`; used with `if: always() && ...` |
+| Sparse checkout | Download only selected files of the repo |
+| SHA-pinned action | `uses: owner/action@<40-char commit>` — immutable, unlike a tag |
 | Linter / formatter | Finds code problems without running it / rewrites layout consistently (ruff does both) |
 | Annotation | Error/warning shown on a file line in GitHub UI (`::error::`, `--output-format=github`) |
 | Personal access token (Docker Hub) | Scoped, revocable password substitute for automation; works with 2FA |

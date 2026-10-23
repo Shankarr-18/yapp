@@ -2,7 +2,18 @@
 
 Legend: ✅ done · 🔄 in progress · ⬜ not started
 
-**Current lesson: 6 — cron workflow.** Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
+**Current lesson: revision day, then 7 — build once, promote.** Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
+
+**Assignment status: all required parts done ✅** (Dockerfile, automatic/manual/cron workflows, Docker Hub push, Secrets + Variables, step/job/workflow outputs, job summaries, ruff lint).
+
+## Revision plan (read in this order, then explain each in your own words)
+1. [docker.md](concepts/docker.md) — image vs container, Dockerfile line by line, ports
+2. [networking.md](concepts/networking.md) — runners, gated-complex analogy, why self-hosted for deploy
+3. [ci.md](concepts/ci.md) — workflow anatomy, jobs on fresh machines, secrets vs variables, tags vs digest
+4. [release.md](concepts/release.md) — reusable workflow = function, SemVer, environments, script injection
+5. [security.md](concepts/security.md) — cron, CVEs, Trivy, risk acceptance, pinning actions by SHA
+6. Open each workflow file in `.github/workflows/` and read it top to bottom with the notes beside it.
+7. Check the 07:00 IST scheduled run of **Nightly check** on GitHub (first automatic cron run).
 
 ## Assignment (from roommate)
 Dockerfile · 3 workflows: **automatic** (push/PR), **manual** (deployment), **cron** · build + push to Docker Hub · GitHub Secrets + Variables · workflow **outputs** · **job summary** on the run page · lint checks.
@@ -17,7 +28,7 @@ Dockerfile · 3 workflows: **automatic** (push/PR), **manual** (deployment), **c
 | 3 | Docker: multi-stage, .dockerignore, HEALTHCHECK, non-root, run on :8500 | ✅ | 2026-10-23 | [docker](concepts/docker.md) |
 | 4 | `ci.yml` (automatic): ruff lint → pytest → build → push to Docker Hub on `main`; Secrets vs Variables; job outputs; job summary | ✅ | 2026-10-23 | [ci](concepts/ci.md) |
 | 5 | Reusable `_build.yml` (workflow outputs) + manual `release.yml` (`workflow_dispatch`, SemVer, `production` Environment approval). First release `0.1.0` | ✅ | 2026-10-23 | [release](concepts/release.md) |
-| 6 | `scheduled.yml` (cron): pull `:latest`, run, `/health`, vulnerability scan, summary | ⬜ | | |
+| 6 | `scheduled.yml` (cron 07:00 IST + manual): pull `:latest`, `/health`, Trivy scan, summary; pillow CVEs accepted in `.trivyignore` (expires 2026-11-23) | ✅ | 2026-10-23 | [security](concepts/security.md) |
 | 7 | Upgrade: build once, promote (release re-tags the CI-tested image instead of rebuilding) | ⬜ | | |
 | 8 | Bonus: self-hosted runner on this Linux server, deploy job → `yapp-app` on :8500 (public repo safeguards: fork-PR approval ✅, runner only for manual job, Environment reviewer ✅; no sudo — user-level systemd) | ⬜ | | |
 
