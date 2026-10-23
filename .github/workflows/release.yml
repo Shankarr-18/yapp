@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (SemVer X.Y.Z, must equal __version__ in app/__init__.py)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check SemVer, branch, app version, and that the tag is new
+        env:
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
+        run: |
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'$VERSION' is not SemVer (expected X.Y.Z, e.g. 1.2.3)"; exit 1
+          fi
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Releases must run from main (got $GITHUB_REF_NAME)"; exit 1
+          fi
+          APP_VERSION=$(sed -nE 's/^__version__ = "(.+)"/\1/p' app/__init__.py)
+          if [[ "$VERSION" != "$APP_VERSION" ]]; then
+            echo "::error::Input $VERSION != __version__ $APP_VERSION in app/__init__.py. Bump it in code first."; exit 1
+          fi
+          if curl -fsS -o /dev/null "https://hub.docker.com/v2/repositories/$REPO/tags/$VERSION"; then
+            echo "::error::$REPO:$VERSION already exists. Release tags are immutable - bump the version."; exit 1
+          fi
+          echo "OK: releasing $REPO:$VERSION from $GITHUB_REF_NAME"
+
+  approve:
+    name: Approve release
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Pauses here until a required reviewer approves (Settings > Environments > production).
+    environment:
+      name: production
+      url: https://hub.docker.com/r/${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}/tags
+    steps:
+      - env:
+          VERSION: ${{ inputs.version }}
+        run: echo "Release $VERSION approved; triggered by $GITHUB_TRIGGERING_ACTOR"
+
+  build:
+    name: Image
+    needs: approve
+    uses: ./.github/workflows/_build.yml
+    with:
+      tags: |
+        type=semver,pattern={{version}},value=${{ inputs.version }}
+        type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
+        type=raw,value=latest
+      push: true
+    secrets:
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  summary:
+    name: Summary
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write release summary
+        env:
+          VERSION: ${{ inputs.version }}
+          IMAGE: ${{ needs.build.outputs.image }}
+          TAGS: ${{ needs.build.outputs.tags }}
+          DIGEST: ${{ needs.build.outputs.digest }}
+        run: |
+          {
+            echo "## 🚀 Released yapp ${VERSION}"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Version | \`${VERSION}\` |"
+            echo "| Commit | \`${GITHUB_SHA::7}\` |"
+            echo "| Released by | @${GITHUB_TRIGGERING_ACTOR} |"
+            echo "| Digest | \`${DIGEST}\` |"
+            echo
+            echo "**Tags**"
+            echo '```'
+            echo "${TAGS}"
+            echo '```'
+            echo "**Pull it (pinned by digest)**"
+            echo '```bash'
+            echo "docker pull ${IMAGE}@${DIGEST}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
