@@ -1,0 +1,86 @@
+name: Nightly check
+
+on:
+  schedule:
+    - cron: "30 1 * * *" # 01:30 UTC = 07:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Pull, health-check, scan latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      IMAGE: docker.io/${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:latest
+    steps:
+      - name: Pull latest image
+        id: pull
+        run: |
+          docker pull "$IMAGE"
+          echo "digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE")" >> "$GITHUB_OUTPUT"
+
+      - name: Start container and call /health
+        id: health
+        run: |
+          docker run -d --name yapp-nightly -p 8000:8000 "$IMAGE"
+          for i in $(seq 1 30); do
+            if BODY=$(curl -fsS http://127.0.0.1:8000/health); then
+              echo "$BODY"
+              echo "version=$(echo "$BODY" | jq -r .version)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::latest did not become healthy"
+          docker logs yapp-nightly
+          exit 1
+
+      - name: Scan for vulnerabilities (Trivy)
+        if: always() && steps.pull.outcome == 'success'
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}
+          format: json
+          output: trivy.json
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Write summary, fail on fixable CRITICAL
+        if: always() && steps.pull.outcome == 'success'
+        env:
+          DIGEST: ${{ steps.pull.outputs.digest }}
+          VERSION: ${{ steps.health.outputs.version }}
+          HEALTH: ${{ steps.health.outcome }}
+        run: |
+          VULNS='[.Results[]?.Vulnerabilities[]?]'
+          CRIT=$(jq "$VULNS | map(select(.Severity == \"CRITICAL\")) | length" trivy.json)
+          HIGH=$(jq "$VULNS | map(select(.Severity == \"HIGH\")) | length" trivy.json)
+          {
+            echo "## 🌙 Nightly check of \`latest\`"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Image | \`${DIGEST}\` |"
+            echo "| App version (/health) | \`${VERSION:-unknown}\` |"
+            echo "| Health check | $([ "$HEALTH" = success ] && echo '✅ healthy' || echo '❌ failed') |"
+            echo "| Fixable CRITICAL | ${CRIT} |"
+            echo "| Fixable HIGH | ${HIGH} |"
+            if [ "$((CRIT + HIGH))" -gt 0 ]; then
+              echo
+              echo "| Severity | Package | Installed | Fixed in | CVE |"
+              echo "|---|---|---|---|---|"
+              jq -r "$VULNS | sort_by(.Severity) | .[:25][] | \"| \(.Severity) | \(.PkgName) | \(.InstalledVersion) | \(.FixedVersion) | \(.VulnerabilityID) |\"" trivy.json
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$CRIT" -gt 0 ]; then
+            echo "::error::${CRIT} fixable CRITICAL vulnerabilities in latest"
+            exit 1
+          fi
