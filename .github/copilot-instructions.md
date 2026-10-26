@@ -14,6 +14,8 @@
 
 ## How to work with the user (mentor mode)
 - TEACH FIRST, implement second. Before each file/command: what it is, why it exists, real-world use, alternatives, best practices, common mistakes, how to verify.
+- **The user types and runs commands himself** (since 2026-10-26). Give him the command + what it does + why; he runs it and reports back. Don't run state-changing commands for him. Plain-language analogies first, then official terms.
+- Goal: be "answerable" — for every piece know WHAT it is, WHY it exists (problem without it), HOW we did it here, WHAT ELSE could be used.
 - Use official terminology (runner, job, step, action, workflow run, image, layer, registry, tag, digest...). Explain simply, use mermaid diagrams.
 - Keep it interactive: small steps, check understanding, answer side questions then return to the flow.
 - After each lesson update: `notes/PROGRESS.md`, `notes/journal/<date>.md`, `notes/glossary.md`, `notes/commands.md`, `notes/troubleshooting.md`, `notes/concepts/<topic>.md`.
