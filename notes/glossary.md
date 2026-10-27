@@ -10,6 +10,7 @@
 | Working tree / Staging area (index) | Your files on disk / what goes into the next commit (`git add`) |
 | Author identity | `user.name` + `user.email` in commit metadata — **not verified** |
 | Authentication | Proof you may push (GCM login, PAT, SSH key) — **verified** |
+| Authorization | What an authenticated identity is allowed to do (deploy key: write, yapp only) |
 | Config levels | `system` → `global` → `local`; most specific wins |
 | GCM | Git Credential Manager — stores credentials in Windows Credential Manager |
 | Rebase | Replay commits on a new base, creating **new** commits (new hashes) |
@@ -101,6 +102,10 @@
 | `steps.<id>.outcome` | Result of a step before `continue-on-error`; used with `if: always() && ...` |
 | Sparse checkout | Download only selected files of the repo |
 | SHA-pinned action | `uses: owner/action@<40-char commit>` — immutable, unlike a tag |
+| Alert fatigue | Alarms that are always on get ignored → real problems slip through |
+| Vulnerability triage | Detect → investigate → assess → decide → document → revisit |
+| Build time vs run time | Making the image (Dockerfile, cache) vs starting a container (`-e` config, ports) |
+| Long polling | Client keeps an outbound connection open asking "any work?" — how self-hosted runners get jobs |
 | Linter / formatter | Finds code problems without running it / rewrites layout consistently (ruff does both) |
 | Annotation | Error/warning shown on a file line in GitHub UI (`::error::`, `--output-format=github`) |
 | Personal access token (Docker Hub) | Scoped, revocable password substitute for automation; works with 2FA |

@@ -2,7 +2,7 @@
 
 Legend: ✅ done · 🔄 in progress · ⬜ not started
 
-**Current lesson: revision day, then 7 — build once, promote.** Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
+**Current lesson: 7 — build once, promote.** Revision of the whole flow done 2026-10-26/27 → [flow cheat sheet](concepts/flow-cheatsheet.md). Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
 
 **Assignment status: all required parts done ✅** (Dockerfile, automatic/manual/cron workflows, Docker Hub push, Secrets + Variables, step/job/workflow outputs, job summaries, ruff lint).
 

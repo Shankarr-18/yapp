@@ -42,6 +42,14 @@ GitHub caveats: may start late (avoid minute 0), runs from the default branch, d
 
 Options compared: **wait** (always red → alert fatigue) · **force pillow 13** (breaks gradio's contract) · **accept with expiry** ✅ · replace gradio (out of scope).
 
+### Second finding (2026-10-25, handled 2026-10-27 by Shankarr-18)
+- Nightly check red 3 mornings in a row → GitHub email.
+- Investigated with a local Trivy scan: **1 new CRITICAL `CVE-2026-112398`** in pillow 12.3.0 (FlashPix parser). OS layer (Debian 13.7) and all other packages clean.
+- gradio still 6.30.0 → same block, same reasoning → appended to `.trivyignore` with the same expiry. CI + manual nightly green.
+- **Why it was caught:** we accept specific CVE IDs, never a whole package. A package-wide ignore would have hidden it.
+- **Policy vs artifact:** `.trivyignore` lives in git and is read at scan time, so no rebuild/re-release was needed.
+- If pillow keeps producing CVEs: watch gradio releases (Dependabot), ask upstream for pillow 13 support, or reconsider gradio.
+
 Reproduce locally (shared server: no Docker socket, remove the image afterwards):
 ```bash
 docker run --rm aquasec/trivy:0.76.1 image --image-src remote --severity CRITICAL,HIGH --ignore-unfixed docker.io/shankar180/yapp:latest
