@@ -30,3 +30,5 @@ CVE-2026-112897 exp:2026-11-23
 CVE-2026-112900 exp:2026-11-23
 CVE-2026-112902 exp:2026-11-23
 GHSA-78g4-xqwv-q3g8 exp:2026-11-23
+# 2026-10-27 — new pillow CVE (FlashPix parser): same root cause (gradio<13) and same reasoning.
+CVE-2026-112398 exp:2026-11-23
