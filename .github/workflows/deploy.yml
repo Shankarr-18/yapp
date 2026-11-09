@@ -1,0 +1,102 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Released version to deploy (X.Y.Z). An older version = rollback."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REPO: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
+  CONTAINER: yapp-app
+  HOST_PORT: "8500"
+
+jobs:
+  resolve:
+    name: Resolve version to digest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      digest: ${{ steps.resolve.outputs.digest }}
+    steps:
+      - name: Check the version was released and look up its digest
+        id: resolve
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'$VERSION' is not SemVer (expected X.Y.Z)"; exit 1
+          fi
+          if ! DIGEST=$(curl -fsS "https://hub.docker.com/v2/repositories/$REPO/tags/$VERSION" | jq -r .digest); then
+            echo "::error::$REPO:$VERSION was never released"; exit 1
+          fi
+          echo "OK: $REPO:$VERSION = $DIGEST"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy to the Linux server
+    needs: resolve
+    # Only our server's runner has the yapp-deploy label.
+    runs-on: [self-hosted, yapp-deploy]
+    timeout-minutes: 10
+    environment: production
+    env:
+      VERSION: ${{ inputs.version }}
+      IMAGE: docker.io/${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}@${{ needs.resolve.outputs.digest }}
+    steps:
+      - name: Pull the exact image by digest
+        run: docker pull "$IMAGE"
+
+      - name: Replace the yapp-app container
+        id: replace
+        run: |
+          PREVIOUS=$(docker inspect --format '{{.Config.Image}}' "$CONTAINER" 2>/dev/null || echo "none")
+          echo "previous=$PREVIOUS" >> "$GITHUB_OUTPUT"
+          docker rm -f "$CONTAINER" 2>/dev/null || true
+          docker run -d --name "$CONTAINER" --restart unless-stopped \
+            -p "127.0.0.1:$HOST_PORT:8000" -e APP_ENV=prod "$IMAGE"
+
+      - name: Health check - is the new version answering on the server?
+        run: |
+          for i in $(seq 1 30); do
+            if BODY=$(curl -fsS "http://127.0.0.1:$HOST_PORT/health"); then
+              echo "$BODY"
+              RUNNING=$(echo "$BODY" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])")
+              if [[ "$RUNNING" == "$VERSION" ]]; then echo "healthy, running $RUNNING"; exit 0; fi
+              echo "::error::/health reports $RUNNING, expected $VERSION"; exit 1
+            fi
+            sleep 2
+          done
+          echo "::error::$CONTAINER did not become healthy"
+          docker logs --tail 50 "$CONTAINER"
+          exit 1
+
+      - name: Write deploy summary
+        if: always()
+        env:
+          PREVIOUS: ${{ steps.replace.outputs.previous }}
+          RESULT: ${{ job.status }}
+        run: |
+          {
+            echo "## 🖥️ Deployed yapp ${VERSION} to the Linux server"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Result | ${RESULT} |"
+            echo "| Version | \`${VERSION}\` |"
+            echo "| Image (by digest) | \`${IMAGE}\` |"
+            echo "| Replaced | \`${PREVIOUS:-none}\` |"
+            echo "| Container | \`${CONTAINER}\` on \`127.0.0.1:${HOST_PORT}\` |"
+            echo "| Deployed by | @${GITHUB_TRIGGERING_ACTOR} |"
+            echo
+            echo "Rollback: run **Deploy** again with the previous version."
+          } >> "$GITHUB_STEP_SUMMARY"
