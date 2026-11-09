@@ -30,7 +30,7 @@ flowchart LR
 - **Immutable versions:** validate fails if the tag already exists on Docker Hub.
 - **Environment `production`:** required reviewer Shankarr-18 (self-review allowed — solo), main only. Jobs with `environment:` pause; a job that `uses:` a reusable workflow can't have `environment:` → separate `approve` gate job.
 - **Script injection:** never `run: echo ${{ inputs.version }}`; use `env: VERSION: ${{ inputs.version }}` then `$VERSION`.
-- **Build once, promote (todo):** our release rebuilds → digest differs from CI's image of the same commit. Better: re-tag the tested `sha-<commit>` image (`docker buildx imagetools create`).
+- **Build once, promote (done 2026-11-09):** validate requires `sha-<commit>` on Docker Hub (CI built + tested this exact commit) and outputs it; `promote` runs `docker buildx imagetools create --tag X.Y.Z --tag X.Y --tag latest <repo>:sha-<commit>` (adds tags on the registry, no build, no download) and fails if the digest changed. Proof for 0.1.1: `sha-ccfcd1b` = `0.1.1` = `0.1` = `latest` = `main` = `sha256:e8a7727d…`. Trade-off: image labels keep CI's values; code (`__version__`) and tags say the version. Rule: release only a commit CI built (not a notes-only commit).
 
 ## Results (2026-10-23)
 - Release run 39996665909 → `0.1.0`, `0.1`, `latest` = `sha256:0bb60bfd…` (CI `sha-f3cd704` = `sha256:eb5c2045…`).

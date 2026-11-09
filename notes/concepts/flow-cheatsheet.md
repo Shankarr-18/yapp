@@ -39,7 +39,7 @@
 9. **Secret** = gives power if leaked (token) · **variable** = harmless config (username). Over-secret = `***` everywhere.
 10. **Tag** = sticky note (moves) · **digest** = fingerprint (never changes) → deploy by digest.
 11. GitHub runner → Docker Hub works (cloud ↔ cloud). Runner → our server fails (private IP, inbound blocked) → **self-hosted runner** polls **outbound**.
-12. Release validate: SemVer · main only · == `__version__` · tag not existing → fail before asking a human.
+12. Release validate: SemVer · main only · == `__version__` · tag not existing · `sha-<commit>` built by CI → fail before asking a human. Release **promotes** (re-tags) the tested image — never rebuilds.
 13. Never put `${{ inputs.x }}` in `run:` → pass via `env:` (data, not code).
 14. **Pin everything that moves:** `==` deps, base image, `ubuntu-24.04`, third-party actions by commit SHA.
 15. **Triage:** detect → investigate → assess → decide → document → revisit. Accept **specific CVE IDs with expiry**, never a whole package. Always-red checks cause **alert fatigue**.

@@ -2,7 +2,7 @@
 
 Legend: ✅ done · 🔄 in progress · ⬜ not started
 
-**Current lesson: 7 — build once, promote.** Revision of the whole flow done 2026-10-26/27 → [flow cheat sheet](concepts/flow-cheatsheet.md). Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
+**Current lesson: 8 — self-hosted runner deploy.** Revision of the whole flow done 2026-10-26/27 → [flow cheat sheet](concepts/flow-cheatsheet.md) · re-quiz [weak spots](weak-spots.md). Dev machine: Linux (`/home/jarvis/shankar/yapp`), host port 8500. Repo: `Shankarr-18/yapp` (public). Docker Hub: `shankar180` → image `shankar180/yapp`.
 
 **Assignment status: all required parts done ✅** (Dockerfile, automatic/manual/cron workflows, Docker Hub push, Secrets + Variables, step/job/workflow outputs, job summaries, ruff lint).
 
@@ -29,7 +29,7 @@ Dockerfile · 3 workflows: **automatic** (push/PR), **manual** (deployment), **c
 | 4 | `ci.yml` (automatic): ruff lint → pytest → build → push to Docker Hub on `main`; Secrets vs Variables; job outputs; job summary | ✅ | 2026-10-23 | [ci](concepts/ci.md) |
 | 5 | Reusable `_build.yml` (workflow outputs) + manual `release.yml` (`workflow_dispatch`, SemVer, `production` Environment approval). First release `0.1.0` | ✅ | 2026-10-23 | [release](concepts/release.md) |
 | 6 | `scheduled.yml` (cron 07:00 IST + manual): pull `:latest`, `/health`, Trivy scan, summary; pillow CVEs accepted in `.trivyignore` (expires 2026-11-23) | ✅ | 2026-10-23 | [security](concepts/security.md) |
-| 7 | Upgrade: build once, promote (release re-tags the CI-tested image instead of rebuilding) | ⬜ | | |
+| 7 | Upgrade: build once, promote (release re-tags the CI-tested image instead of rebuilding). Released `0.1.1` = `sha-ccfcd1b` (same digest) | ✅ | 2026-11-09 | [release](concepts/release.md) |
 | 8 | Bonus: self-hosted runner on this Linux server, deploy job → `yapp-app` on :8500 (public repo safeguards: fork-PR approval ✅, runner only for manual job, Environment reviewer ✅; no sudo — user-level systemd) | ⬜ | | |
 
 ## Phase 2 — Docker Compose, multiple services, databases

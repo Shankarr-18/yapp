@@ -75,6 +75,16 @@ Format: **Symptom → Cause → Fix → Lesson**
 - **Cause:** Author is stamped into each commit when it's created; changing `user.name`/`user.email` only affects new commits.
 - **Fix (unpushed only):** set the new local identity, then `git rebase --root --exec "git commit --amend --no-edit --reset-author"`. Verify with `git log --format='%an <%ae>'`.
 
+## Terminal
+
+### `git diff` / `git log` output stuck with `:` or `(END)` at the bottom
+- **Cause:** output opened in the pager `less`; keys are `less` commands (typing `s...` = "save to file").
+- **Fix:** press **q**. Or `git --no-pager diff`. Ctrl+Z only *suspends* it (`[1]+ Stopped`) → `jobs`, then `kill %1`.
+
+### Unexpected `>` prompt after a command
+- **Cause:** an unclosed `"`, `'` or `(` — bash waits for the rest.
+- **Fix:** Ctrl+C, retype with the closing quote.
+
 ## Ports / networking
 
 ### `[Errno 98] Address already in use` / port 8000 busy
