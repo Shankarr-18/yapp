@@ -15,18 +15,23 @@ concurrency:
   group: release
   cancel-in-progress: false
 
+env:
+  REPO: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
+
 jobs:
   validate:
     name: Validate version
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    outputs:
+      source: ${{ steps.check.outputs.source }}
     steps:
       - uses: actions/checkout@v7
 
-      - name: Check SemVer, branch, app version, and that the tag is new
+      - name: Check SemVer, branch, app version, new tag, and that CI built this commit
+        id: check
         env:
           VERSION: ${{ inputs.version }}
-          REPO: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
         run: |
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::'$VERSION' is not SemVer (expected X.Y.Z, e.g. 1.2.3)"; exit 1
@@ -41,7 +46,12 @@ jobs:
           if curl -fsS -o /dev/null "https://hub.docker.com/v2/repositories/$REPO/tags/$VERSION"; then
             echo "::error::$REPO:$VERSION already exists. Release tags are immutable - bump the version."; exit 1
           fi
-          echo "OK: releasing $REPO:$VERSION from $GITHUB_REF_NAME"
+          SOURCE="sha-${GITHUB_SHA::7}"
+          if ! curl -fsS -o /dev/null "https://hub.docker.com/v2/repositories/$REPO/tags/$SOURCE"; then
+            echo "::error::$REPO:$SOURCE not found. CI must build and test this exact commit before it can be released."; exit 1
+          fi
+          echo "source=$SOURCE" >> "$GITHUB_OUTPUT"
+          echo "OK: will promote $REPO:$SOURCE to $VERSION"
 
   approve:
     name: Approve release
@@ -57,30 +67,52 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: echo "Release $VERSION approved; triggered by $GITHUB_TRIGGERING_ACTOR"
 
-  build:
-    name: Image
-    needs: approve
-    uses: ./.github/workflows/_build.yml
-    with:
-      tags: |
-        type=semver,pattern={{version}},value=${{ inputs.version }}
-        type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
-        type=raw,value=latest
-      push: true
-    secrets:
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  promote:
+    name: Promote tested image (no rebuild)
+    needs: [validate, approve]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      digest: ${{ steps.tag.outputs.digest }}
+    steps:
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Add release tags to the CI-tested image and verify the digest is unchanged
+        id: tag
+        env:
+          VERSION: ${{ inputs.version }}
+          SOURCE: ${{ needs.validate.outputs.source }}
+        run: |
+          digest_of() { docker buildx imagetools inspect "docker.io/$REPO:$1" | awk '/^Digest:/ {print $2; exit}'; }
+          docker buildx imagetools create \
+            --tag "docker.io/$REPO:$VERSION" \
+            --tag "docker.io/$REPO:${VERSION%.*}" \
+            --tag "docker.io/$REPO:latest" \
+            "docker.io/$REPO:$SOURCE"
+          TESTED=$(digest_of "$SOURCE")
+          RELEASED=$(digest_of "$VERSION")
+          echo "tested   $SOURCE  $TESTED"
+          echo "released $VERSION  $RELEASED"
+          if [[ "$TESTED" != "$RELEASED" ]]; then
+            echo "::error::Digest changed during promotion"; exit 1
+          fi
+          echo "digest=$RELEASED" >> "$GITHUB_OUTPUT"
 
   summary:
     name: Summary
-    needs: build
+    needs: [validate, promote]
     runs-on: ubuntu-24.04
     steps:
       - name: Write release summary
         env:
           VERSION: ${{ inputs.version }}
-          IMAGE: ${{ needs.build.outputs.image }}
-          TAGS: ${{ needs.build.outputs.tags }}
-          DIGEST: ${{ needs.build.outputs.digest }}
+          SOURCE: ${{ needs.validate.outputs.source }}
+          DIGEST: ${{ needs.promote.outputs.digest }}
         run: |
           {
             echo "## 🚀 Released yapp ${VERSION}"
@@ -89,15 +121,14 @@ jobs:
             echo "|---|---|"
             echo "| Version | \`${VERSION}\` |"
             echo "| Commit | \`${GITHUB_SHA::7}\` |"
+            echo "| Promoted from (CI-tested) | \`${SOURCE}\` |"
+            echo "| Digest (same as tested) | \`${DIGEST}\` |"
             echo "| Released by | @${GITHUB_TRIGGERING_ACTOR} |"
-            echo "| Digest | \`${DIGEST}\` |"
             echo
-            echo "**Tags**"
-            echo '```'
-            echo "${TAGS}"
-            echo '```'
+            echo "**Tags**: \`${VERSION}\`, \`${VERSION%.*}\`, \`latest\`"
+            echo
             echo "**Pull it (pinned by digest)**"
             echo '```bash'
-            echo "docker pull ${IMAGE}@${DIGEST}"
+            echo "docker pull docker.io/${REPO}@${DIGEST}"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
