@@ -12,3 +12,4 @@ Review: 2026-11-11 · 2026-11-16 · 2026-11-30. Add every new miss here.
 | 6 | Why is rebuilding at release time risky? | The released box ≠ the tested box (new build, new digest; deps/base may have changed). **Build once, promote**: release only re-tags the CI-tested `sha-` image. | 2026-11-09 |
 | 7 | The 8 stages? | Recipe → Save → Taste → Box → Shelf → **Label (release)** → Serve → Inspect. | 2026-11-09 (missed Label) |
 | 8 | CI vs Continuous Delivery vs Deployment? | CI = merge changes into main often, each auto-checked. Delivery = always releasable, **human** decides. Deployment = goes live **automatically**. | 2026-11-09 |
+| 9 | What does `localhost` / `127.0.0.1` mean? | "The machine I'm on right now" — your laptop, the server and each container each have their own. A tunnel (VS Code port forward / `ssh -L`) carries my localhost:8500 to the server's localhost:8500. | 2026-11-09 |

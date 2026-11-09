@@ -77,6 +77,12 @@ Format: **Symptom → Cause → Fix → Lesson**
 
 ## Terminal
 
+### Workflow run fails with 0 jobs: "Internal server error. Correlation ID: …" (2026-11-09)
+- **Cause:** GitHub-side failure (5xx) before any job started — githubstatus.com showed **Actions: major_outage**. Not our files: unchanged `ci.yml` failed at the same time.
+- **Fix:** wait, then **Re-run all jobs**. Persisting for days → GitHub Support with the correlation IDs.
+- Check: `curl -s https://www.githubstatus.com/api/v2/components.json` (Actions / API Requests / Git Operations).
+- **Lesson:** 4xx = caller's fault, 5xx = server's fault. When unrelated things fail together, look outside your code. CI/CD depends on the SaaS being up — keep a manual "break-glass" runbook.
+
 ### `git diff` / `git log` output stuck with `:` or `(END)` at the bottom
 - **Cause:** output opened in the pager `less`; keys are `less` commands (typing `s...` = "save to file").
 - **Fix:** press **q**. Or `git --no-pager diff`. Ctrl+Z only *suspends* it (`[1]+ Stopped`) → `jobs`, then `kill %1`.

@@ -43,6 +43,8 @@
 13. Never put `${{ inputs.x }}` in `run:` → pass via `env:` (data, not code).
 14. **Pin everything that moves:** `==` deps, base image, `ubuntu-24.04`, third-party actions by commit SHA.
 15. **Triage:** detect → investigate → assess → decide → document → revisit. Accept **specific CVE IDs with expiry**, never a whole package. Always-red checks cause **alert fatigue**.
+16. **Deploy** = run one exact box (by digest) on a server; **rollback** = deploy an older digest (seconds). Private server → **self-hosted runner** polls outbound.
+17. `localhost` = **the machine I'm on**. A tunnel (VS Code port forward / `ssh -L`) carries my localhost to the server's localhost.
 
 ## Interview one-liners
 | Question | Answer |

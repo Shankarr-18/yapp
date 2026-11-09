@@ -30,7 +30,7 @@ Dockerfile · 3 workflows: **automatic** (push/PR), **manual** (deployment), **c
 | 5 | Reusable `_build.yml` (workflow outputs) + manual `release.yml` (`workflow_dispatch`, SemVer, `production` Environment approval). First release `0.1.0` | ✅ | 2026-10-23 | [release](concepts/release.md) |
 | 6 | `scheduled.yml` (cron 07:00 IST + manual): pull `:latest`, `/health`, Trivy scan, summary; pillow CVEs accepted in `.trivyignore` (expires 2026-11-23) | ✅ | 2026-10-23 | [security](concepts/security.md) |
 | 7 | Upgrade: build once, promote (release re-tags the CI-tested image instead of rebuilding). Released `0.1.1` = `sha-ccfcd1b` (same digest) | ✅ | 2026-11-09 | [release](concepts/release.md) |
-| 8 | Bonus: self-hosted runner on this Linux server, deploy job → `yapp-app` on :8500 (public repo safeguards: fork-PR approval ✅, runner only for manual job, Environment reviewer ✅; no sudo — user-level systemd) | ⬜ | | |
+| 8 | Self-hosted runner `yapp-runner-bglr` (label `yapp-deploy`, in tmux) + `deploy.yml` (resolve digest on GitHub → deploy on our runner, approval, `/health` version check). Break-glass manual deploy of 0.1.1 + rollback drill (0.1.0 in ~5 s) done. **Todo:** run Deploy workflow once Actions outage is over; keep runner alive across reboots | 🔄 | 2026-11-09 | [deploy](concepts/deploy.md) |
 
 ## Phase 2 — Docker Compose, multiple services, databases
 ⬜ Branching strategy: introduce `dev` branch + PR flow
